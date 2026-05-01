@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Light mode (default) */
+  :root {
+    --color-primary: #032d42;
+    --color-success: #63df4e;
+    --color-accent: #338b9d;
+    --color-bg: #ffffff;
+    --color-surface: #f8f9fa;
+    --color-text: #11181c;
+    --color-text-secondary: #687076;
+    --color-border: #e5e7eb;
+  }
+
+  /* Dark mode */
+  .dark {
+    --color-primary: #1a5a6f;
+    --color-success: #4fb035;
+    --color-accent: #5ba8b8;
+    --color-bg: #0f1419;
+    --color-surface: #1a1f26;
+    --color-text: #ecedee;
+    --color-text-secondary: #9ba1a6;
+    --color-border: #2d3748;
+  }
+}
+
+@layer components {
+  /* Primary color utilities */
+  .text-primary {
+    @apply text-[#032d42] dark:text-[#1a5a6f];
+  }
+
+  .bg-primary {
+    @apply bg-[#032d42] dark:bg-[#1a5a6f];
+  }
+
+  .border-primary {
+    @apply border-[#032d42] dark:border-[#1a5a6f];
+  }
+
+  /* Success color utilities */
+  .text-success {
+    @apply text-[#63df4e] dark:text-[#4fb035];
+  }
+
+  .bg-success {
+    @apply bg-[#63df4e] dark:bg-[#4fb035];
+  }
+
+  /* Accent color utilities */
+  .text-accent {
+    @apply text-[#338b9d] dark:text-[#5ba8b8];
+  }
+
+  .bg-accent {
+    @apply bg-[#338b9d] dark:bg-[#5ba8b8];
+  }
+
+  /* Semantic utilities */
+  .bg-app {
+    @apply bg-white dark:bg-[#0f1419];
+  }
+
+  .bg-surface {
+    @apply bg-[#f8f9fa] dark:bg-[#1a1f26];
+  }
+
+  .text-app {
+    @apply text-[#11181c] dark:text-[#ecedee];
+  }
+
+  .text-secondary {
+    @apply text-[#687076] dark:text-[#9ba1a6];
+  }
+
+  .border-app {
+    @apply border-[#e5e7eb] dark:border-[#2d3748];
+  }
+}
