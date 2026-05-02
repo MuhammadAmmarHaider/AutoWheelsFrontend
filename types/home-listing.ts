@@ -30,6 +30,79 @@ export type ShowroomCatalogCard = {
   model: { name: string };
 };
 
+// Detailed types for full page views
+export type CarDimensions = {
+  id: string;
+  length?: number;
+  width?: number;
+  height?: number;
+  wheelbase?: number;
+  groundClearance?: number;
+  bootSpace?: number;
+  doors?: number;
+  seating?: number;
+};
+
+export type CarEngineDetails = {
+  id: string;
+  type?: string;
+  turbocharged: boolean;
+  displacement?: number;
+  cylinders?: number;
+  drivetrain?: string;
+  fuelSystem?: string;
+  valveMechanism?: string;
+  maxSpeed?: number;
+};
+
+export type CarTransmissionDetails = {
+  id: string;
+  type?: string;
+  gearbox?: string;
+};
+
+export type CarSteering = {
+  id: string;
+  type?: string;
+  turningRadius?: number;
+  powerAssisted: boolean;
+};
+
+export type CarSuspension = {
+  id: string;
+  front?: string;
+  frontBrakes?: string;
+  rear?: string;
+  rearBrakes?: string;
+};
+
+export type CarWheels = {
+  id: string;
+  wheelType?: string;
+  tyreSize?: string;
+  wheelSize?: string;
+  pcd?: string;
+  spareTyreSize?: string;
+};
+
+export type CarFuelEconomy = {
+  id: string;
+  cityMileage?: number;
+  highwayMileage?: number;
+  tankCapacity?: number;
+};
+
+export type CatalogDetailComplete = ShowroomCatalogCard & {
+  features?: string[];
+  dimensions?: CarDimensions;
+  engineDetails?: CarEngineDetails;
+  transmissionDetails?: CarTransmissionDetails;
+  steering?: CarSteering;
+  suspension?: CarSuspension;
+  wheels?: CarWheels;
+  fuelEconomy?: CarFuelEconomy;
+};
+
 export type HomeFeedSection = {
   key: HomeSectionKey;
   title: string;

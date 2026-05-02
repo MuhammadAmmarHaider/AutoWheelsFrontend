@@ -355,13 +355,17 @@ export default function HomeScreen() {
                   contentContainerStyle={{ paddingHorizontal: 16, gap: 12 }}
                 >
                   {(section.listings ?? []).slice(0, 10).map((listing) => (
-                    <View key={listing.id} style={{ width: CARD_WIDTH }}>
+                    <Pressable
+                      key={listing.id}
+                      onPress={() => router.push(`/listing/${listing.id}`)}
+                      style={{ width: CARD_WIDTH }}
+                    >
                       <HomeCarCard
                         listing={listing}
                         colors={colors}
                         width={CARD_WIDTH}
                       />
-                    </View>
+                    </Pressable>
                   ))}
                   {(!section.listings || section.listings.length === 0) && (
                     <Text
@@ -387,7 +391,9 @@ export default function HomeScreen() {
                     {section.title}
                   </Text>
                   <Pressable
-                    onPress={() => openCatalogBrowse(section.key as CatalogSectionKey)}
+                    onPress={() =>
+                      openCatalogBrowse(section.key as CatalogSectionKey)
+                    }
                     hitSlop={8}
                   >
                     <Text

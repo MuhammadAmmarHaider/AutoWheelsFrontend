@@ -20,7 +20,10 @@ import { useTheme } from "@/hooks/use-theme";
 import { apiRequest } from "@/lib/api";
 import { getAuthToken } from "@/lib/auth-storage";
 import type { FavoriteListingIdsResponse } from "@/types/favorites";
-import type { ExploreListingsResponse, HomeListingCard } from "@/types/home-listing";
+import type {
+  ExploreListingsResponse,
+  HomeListingCard,
+} from "@/types/home-listing";
 
 const HEADER_BG = SELL_NOW_THEME.header;
 
@@ -31,8 +34,7 @@ export default function UsedExploreScreen() {
   const colors = getAppColors(isDark);
   const params = useLocalSearchParams<{ cityId?: string; search?: string }>();
 
-  const initialCity =
-    typeof params.cityId === "string" ? params.cityId : "";
+  const initialCity = typeof params.cityId === "string" ? params.cityId : "";
   const initialSearchDecoded = useMemo(() => {
     const raw = typeof params.search === "string" ? params.search : "";
     if (!raw) return "";
@@ -183,17 +185,29 @@ export default function UsedExploreScreen() {
             >
               <Ionicons name="chevron-back" size={26} color="#fff" />
             </Pressable>
-            <Text className="text-2xl font-bold text-white">Browse used cars</Text>
+            <Text className="text-2xl font-bold text-white">
+              Browse used cars
+            </Text>
           </View>
         </View>
       </SafeAreaView>
 
-      <View className="px-4 pb-4 pt-3" style={{ backgroundColor: colors.background }}>
+      <View
+        className="px-4 pb-4 pt-3"
+        style={{ backgroundColor: colors.background }}
+      >
         <View
           className="flex-row items-center rounded-xl border px-3 py-2"
-          style={{ borderColor: colors.border, backgroundColor: colors.surface }}
+          style={{
+            borderColor: colors.border,
+            backgroundColor: colors.surface,
+          }}
         >
-          <Ionicons name="search-outline" size={20} color={colors.textSecondary} />
+          <Ionicons
+            name="search-outline"
+            size={20}
+            color={colors.textSecondary}
+          />
           <TextInput
             className="flex-1 py-2 pl-2 text-[15px]"
             placeholder="Search used cars…"
@@ -204,7 +218,11 @@ export default function UsedExploreScreen() {
             autoCorrect={false}
             autoCapitalize="none"
           />
-          <Pressable onPress={() => router.push("/saved-ads")} hitSlop={10} accessibilityLabel="Saved ads">
+          <Pressable
+            onPress={() => router.push("/saved-ads")}
+            hitSlop={10}
+            accessibilityLabel="Saved ads"
+          >
             <Ionicons name="heart-outline" size={24} color={colors.tabActive} />
           </Pressable>
         </View>
@@ -217,7 +235,10 @@ export default function UsedExploreScreen() {
           </View>
         ) : error ? (
           <View className="flex-1 items-center justify-center px-8">
-            <Text style={{ color: colors.textSecondary }} className="text-center text-base">
+            <Text
+              style={{ color: colors.textSecondary }}
+              className="text-center text-base"
+            >
               {error}
             </Text>
             <Pressable
@@ -237,21 +258,32 @@ export default function UsedExploreScreen() {
             onEndReached={() => void loadMore()}
             ListFooterComponent={
               loadingMore ? (
-                <ActivityIndicator style={{ marginTop: 16 }} color={colors.tabActive} />
+                <ActivityIndicator
+                  style={{ marginTop: 16 }}
+                  color={colors.tabActive}
+                />
               ) : items.length === 0 ? (
-                <Text className="mt-12 text-center text-base" style={{ color: colors.textSecondary }}>
+                <Text
+                  className="mt-12 text-center text-base"
+                  style={{ color: colors.textSecondary }}
+                >
                   No used listings yet.
                 </Text>
               ) : null
             }
             renderItem={({ item }) => (
-              <VehicleListingCard
-                listing={item}
-                colors={colors}
-                isFavorite={favoriteIds.has(item.id)}
-                favoriteDisabled={favBusyId === item.id}
-                onToggleFavorite={() => void toggleFavorite(item.id)}
-              />
+              <Pressable
+                onPress={() => router.push(`/listing/${item.id}`)}
+                style={{ marginBottom: 12 }}
+              >
+                <VehicleListingCard
+                  listing={item}
+                  colors={colors}
+                  isFavorite={favoriteIds.has(item.id)}
+                  favoriteDisabled={favBusyId === item.id}
+                  onToggleFavorite={() => void toggleFavorite(item.id)}
+                />
+              </Pressable>
             )}
           />
         )}

@@ -143,14 +143,8 @@ export default function MyAdsScreen() {
   return (
     <View className="flex-1" style={{ backgroundColor: screenBg }}>
       <SafeAreaView edges={["top"]} style={{ backgroundColor: HEADER_BG }}>
-        <StatusBar
-          barStyle="light-content"
-          backgroundColor={HEADER_BG}
-        />
-        <View
-          style={{ backgroundColor: HEADER_BG }}
-          className="px-5 pb-4 pt-2"
-        >
+        <StatusBar barStyle="light-content" backgroundColor={HEADER_BG} />
+        <View style={{ backgroundColor: HEADER_BG }} className="px-5 pb-4 pt-2">
           <View className="flex-row items-center gap-3">
             <Pressable
               onPress={() => router.back()}
@@ -179,7 +173,9 @@ export default function MyAdsScreen() {
               className="flex-1 items-center py-3"
               style={{
                 borderBottomWidth: selected ? 3 : 0,
-                borderBottomColor: selected ? colors.textPrimary : "transparent",
+                borderBottomColor: selected
+                  ? colors.textPrimary
+                  : "transparent",
               }}
             >
               <Text
@@ -260,34 +256,36 @@ export default function MyAdsScreen() {
                   : "removed";
 
             return (
-              <MyAdListItem
-                listing={item}
-                variant={variant}
-                colors={colors}
-                onEdit={() =>
-                  Alert.alert(
-                    "Edit listing",
-                    "Editing from the app will be available in a future update.",
-                  )
-                }
-                onReactivate={
-                  tab === "SOLD"
-                    ? () => {
-                        Alert.alert(
-                          "Re-activate listing",
-                          "This will mark your ad as active again.",
-                          [
-                            { text: "Cancel", style: "cancel" },
-                            {
-                              text: "Re-Activate",
-                              onPress: () => void reactivateListing(item.id),
-                            },
-                          ],
-                        );
-                      }
-                    : undefined
-                }
-              />
+              <Pressable onPress={() => router.push(`/listing/${item.id}`)}>
+                <MyAdListItem
+                  listing={item}
+                  variant={variant}
+                  colors={colors}
+                  onEdit={() =>
+                    Alert.alert(
+                      "Edit listing",
+                      "Editing from the app will be available in a future update.",
+                    )
+                  }
+                  onReactivate={
+                    tab === "SOLD"
+                      ? () => {
+                          Alert.alert(
+                            "Re-activate listing",
+                            "This will mark your ad as active again.",
+                            [
+                              { text: "Cancel", style: "cancel" },
+                              {
+                                text: "Re-Activate",
+                                onPress: () => void reactivateListing(item.id),
+                              },
+                            ],
+                          );
+                        }
+                      : undefined
+                  }
+                />
+              </Pressable>
             );
           }}
         />
