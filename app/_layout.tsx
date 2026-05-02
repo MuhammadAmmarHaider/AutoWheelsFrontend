@@ -27,6 +27,10 @@ function RootLayoutContent() {
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="login" options={{ headerShown: false }} />
           <Stack.Screen name="signup" options={{ headerShown: false }} />
+          <Stack.Screen name="browse" options={{ headerShown: false }} />
+          <Stack.Screen name="used-explore" options={{ headerShown: false }} />
+          <Stack.Screen name="saved-ads" options={{ headerShown: false }} />
+          <Stack.Screen name="catalog/[id]" options={{ headerShown: false }} />
         </Stack>
         <StatusBar style={isDark ? "light" : "dark"} />
       </View>

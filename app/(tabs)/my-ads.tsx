@@ -5,12 +5,15 @@ import {
   FlatList,
   Pressable,
   RefreshControl,
+  StatusBar,
   Text,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useFocusEffect } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { useRouter } from "expo-router";
 
 import { MyAdListItem, type MyListing } from "@/components/my-ad-list-item";
 import { SELL_NOW_THEME } from "@/constants/sell-now-theme";
@@ -55,6 +58,7 @@ function emptyCopy(tab: TabKey): { title: string; subtitle: string } {
 }
 
 export default function MyAdsScreen() {
+  const router = useRouter();
   const authGate = useRequireAuth();
   const { isDark } = useTheme();
   const colors = getAppColors(isDark);
@@ -139,10 +143,25 @@ export default function MyAdsScreen() {
   return (
     <View className="flex-1" style={{ backgroundColor: screenBg }}>
       <SafeAreaView edges={["top"]} style={{ backgroundColor: HEADER_BG }}>
-        <View className="py-3.5">
-          <Text className="text-center text-lg font-bold text-white">
-            My Ads
-          </Text>
+        <StatusBar
+          barStyle="light-content"
+          backgroundColor={HEADER_BG}
+        />
+        <View
+          style={{ backgroundColor: HEADER_BG }}
+          className="px-5 pb-4 pt-2"
+        >
+          <View className="flex-row items-center gap-3">
+            <Pressable
+              onPress={() => router.back()}
+              hitSlop={12}
+              accessibilityRole="button"
+              accessibilityLabel="Go back"
+            >
+              <Ionicons name="chevron-back" size={26} color="#fff" />
+            </Pressable>
+            <Text className="text-2xl font-bold text-white">My Ads</Text>
+          </View>
         </View>
       </SafeAreaView>
 
