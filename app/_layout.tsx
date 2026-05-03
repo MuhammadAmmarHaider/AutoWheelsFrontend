@@ -31,6 +31,8 @@ function RootLayoutContent() {
           <Stack.Screen name="used-explore" options={{ headerShown: false }} />
           <Stack.Screen name="saved-ads" options={{ headerShown: false }} />
           <Stack.Screen name="catalog/[id]" options={{ headerShown: false }} />
+          <Stack.Screen name="listing/[id]" options={{ headerShown: false }} />
+          <Stack.Screen name="chat-detail" options={{ headerShown: false }} />
         </Stack>
         <StatusBar style={isDark ? "light" : "dark"} />
       </View>

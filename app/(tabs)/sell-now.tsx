@@ -18,7 +18,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { Ionicons, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 import { apiRequest, uploadImages } from "@/lib/api";
@@ -371,6 +371,7 @@ function SelectModal({
 
 export default function SellNowScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ listingId?: string }>();
   const authGate = useRequireAuth();
   const dispatch = useDispatch<AppDispatch>();
   const { sellFormOptions, currentUser, loadingFormOptions, loadingUserData } =
@@ -378,6 +379,7 @@ export default function SellNowScreen() {
 
   const [posting, setPosting] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [loadingListing, setLoadingListing] = useState(false);
   const [selectedCityId, setSelectedCityId] = useState("");
   const [selectedRegisteredCityId, setSelectedRegisteredCityId] = useState("");
   const [selectedModelId, setSelectedModelId] = useState("");
@@ -397,6 +399,8 @@ export default function SellNowScreen() {
     useState(false);
   const [modelModalVisible, setModelModalVisible] = useState(false);
   const [bodyColorModalVisible, setBodyColorModalVisible] = useState(false);
+
+  const isEditMode = !!params.listingId;
 
   // API returns [] when DB has no rows; [] is truthy so `||` would not fall back.
   const cities =
@@ -427,6 +431,49 @@ export default function SellNowScreen() {
       setContactPhone(currentUser.phone || "");
     }
   }, [currentUser]);
+
+  // Load existing listing data when in edit mode
+  useEffect(() => {
+    if (!isEditMode || !params.listingId) return;
+
+    const loadListing = async () => {
+      setLoadingListing(true);
+      try {
+        const listing = await apiRequest<any>(`/listings/${params.listingId}`, {
+          method: "GET",
+        });
+
+        // Pre-fill form with existing data
+        setSelectedCityId(listing.cityId || "");
+        setSelectedRegisteredCityId(listing.registeredCityId || "");
+        setSelectedModelId(listing.modelId || "");
+        setYear(listing.year?.toString() || "");
+        setBodyColor(listing.bodyColor || "");
+        setKmsDriven(listing.mileage?.toString() || "");
+        setDescription(listing.description || "");
+        setPrice(listing.price?.toString() || "");
+        setContactName(listing.contactName || "");
+        setContactPhone(listing.contactPhone || "");
+        setAllowWhatsapp(listing.allowWhatsapp ?? true);
+        
+        // Set images
+        if (listing.images && listing.images.length > 0) {
+          const urls = listing.images.map((img: any) => img.url);
+          setImageUrls(urls);
+          setLocalImageUris(urls);
+        }
+      } catch (error) {
+        Alert.alert(
+          "Error",
+          error instanceof Error ? error.message : "Failed to load listing"
+        );
+      } finally {
+        setLoadingListing(false);
+      }
+    };
+
+    void loadListing();
+  }, [isEditMode, params.listingId]);
 
   const pickImages = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -492,25 +539,49 @@ export default function SellNowScreen() {
 
     setPosting(true);
     try {
-      await apiRequest("/listings", {
-        method: "POST",
-        auth: true,
-        body: {
-          modelId: selectedModelId,
-          brandId: selectedModel?.brandId,
-          cityId: selectedCityId,
-          registeredCityId: selectedRegisteredCityId,
-          year: Number(year),
-          mileage: Number(kmsDriven),
-          bodyColor,
-          description,
-          price: Number(price),
-          contactName,
-          contactPhone,
-          allowWhatsapp,
-          imageUrls: imageUrls,
-        },
-      });
+      if (isEditMode && params.listingId) {
+        // Update existing listing
+        await apiRequest(`/listings/${params.listingId}`, {
+          method: "PUT",
+          auth: true,
+          body: {
+            modelId: selectedModelId,
+            brandId: selectedModel?.brandId,
+            cityId: selectedCityId,
+            registeredCityId: selectedRegisteredCityId,
+            year: Number(year),
+            mileage: Number(kmsDriven),
+            bodyColor,
+            description,
+            price: Number(price),
+            contactName,
+            contactPhone,
+            allowWhatsapp,
+            imageUrls: imageUrls,
+          },
+        });
+      } else {
+        // Create new listing
+        await apiRequest("/listings", {
+          method: "POST",
+          auth: true,
+          body: {
+            modelId: selectedModelId,
+            brandId: selectedModel?.brandId,
+            cityId: selectedCityId,
+            registeredCityId: selectedRegisteredCityId,
+            year: Number(year),
+            mileage: Number(kmsDriven),
+            bodyColor,
+            description,
+            price: Number(price),
+            contactName,
+            contactPhone,
+            allowWhatsapp,
+            imageUrls: imageUrls,
+          },
+        });
+      }
 
       setImageUrls([]);
       setLocalImageUris([]);
@@ -526,7 +597,7 @@ export default function SellNowScreen() {
       router.replace("/my-ads");
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "Failed to post ad.";
+        error instanceof Error ? error.message : isEditMode ? "Failed to update ad." : "Failed to post ad.";
       Alert.alert("Error", message);
     } finally {
       setPosting(false);
@@ -534,6 +605,19 @@ export default function SellNowScreen() {
   };
 
   if (authGate !== "allowed") {
+    return (
+      <SafeAreaView
+        edges={["top"]}
+        style={{ backgroundColor: theme.screenBg }}
+        className="flex-1 items-center justify-center"
+      >
+        <StatusBar barStyle="dark-content" />
+        <ActivityIndicator size="large" color={theme.button} />
+      </SafeAreaView>
+    );
+  }
+
+  if (loadingListing) {
     return (
       <SafeAreaView
         edges={["top"]}
@@ -559,9 +643,11 @@ export default function SellNowScreen() {
         className="px-5 pb-4 pt-2"
       >
         <View className="flex-row items-center gap-3">
-          <Ionicons name="chevron-back" size={26} color="#fff" />
+          <Pressable onPress={() => router.back()}>
+            <Ionicons name="chevron-back" size={26} color="#fff" />
+          </Pressable>
           <Text className="text-2xl font-bold text-white">
-            Sell Your Vehicle
+            {isEditMode ? "Edit Ad" : "Sell Your Vehicle"}
           </Text>
         </View>
       </View>
@@ -934,7 +1020,7 @@ export default function SellNowScreen() {
                   style={{ color: theme.buttonText }}
                   className="text-lg font-semibold"
                 >
-                  Post Ad
+                  {isEditMode ? "Update Ad" : "Post Ad"}
                 </Text>
               )}
             </Pressable>

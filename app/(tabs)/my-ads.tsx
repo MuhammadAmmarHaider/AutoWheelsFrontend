@@ -262,10 +262,10 @@ export default function MyAdsScreen() {
                   variant={variant}
                   colors={colors}
                   onEdit={() =>
-                    Alert.alert(
-                      "Edit listing",
-                      "Editing from the app will be available in a future update.",
-                    )
+                    router.push({
+                      pathname: "/(tabs)/sell-now",
+                      params: { listingId: item.id },
+                    })
                   }
                   onReactivate={
                     tab === "SOLD"

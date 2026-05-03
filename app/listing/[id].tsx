@@ -112,8 +112,13 @@ export default function ListingDetailScreen() {
 
   const handleSendMessage = () => {
     router.push({
-      pathname: "/chat",
-      params: { sellerId: listing?.user?.id },
+      pathname: "/chat-detail",
+      params: {
+        userId: listing?.user?.id,
+        userName: listing?.user?.name,
+        listingId: listing?.id,
+        listingTitle: listing?.title,
+      },
     });
   };
 
