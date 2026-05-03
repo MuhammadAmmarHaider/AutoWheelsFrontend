@@ -8,6 +8,7 @@ import {
   View,
   Pressable,
   StatusBar,
+  Share,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -15,6 +16,7 @@ import { Image } from "expo-image";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 
 import { getAppColors } from "@/constants/app-colors";
+import { SELL_NOW_THEME } from "@/constants/sell-now-theme";
 import { useTheme } from "@/hooks/use-theme";
 import { apiRequest } from "@/lib/api";
 import type { CatalogDetailComplete } from "@/types/home-listing";
@@ -24,6 +26,7 @@ import NewCarCatalogCard from "@/components/new-car-catalog-card";
 
 const { width: screenWidth } = Dimensions.get("window");
 const IMAGE_HEIGHT = 300;
+const HEADER_COLOR = "#032d42";
 
 function formatPkr(amount: number | null | undefined): string {
   if (!amount || amount === 0) return "Price on request";
@@ -33,6 +36,59 @@ function formatPkr(amount: number | null | undefined): string {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(amount);
+}
+
+function calculateOverallRating(reviews: any[]): number {
+  if (!reviews || reviews.length === 0) return 0;
+  const sum = reviews.reduce((acc, review) => acc + review.overallRating, 0);
+  return sum / reviews.length;
+}
+
+function calculateCategoryRatings(reviews: any[]): {
+  style: number;
+  comfort: number;
+  fuelEconomy: number;
+  performance: number;
+  valueForMoney: number;
+} {
+  if (!reviews || reviews.length === 0) {
+    return { style: 0, comfort: 0, fuelEconomy: 0, performance: 0, valueForMoney: 0 };
+  }
+  
+  const totals = reviews.reduce(
+    (acc, review) => ({
+      style: acc.style + review.styleRating,
+      comfort: acc.comfort + review.comfortRating,
+      fuelEconomy: acc.fuelEconomy + review.fuelEconomyRating,
+      performance: acc.performance + review.performanceRating,
+      valueForMoney: acc.valueForMoney + review.valueForMoneyRating,
+    }),
+    { style: 0, comfort: 0, fuelEconomy: 0, performance: 0, valueForMoney: 0 }
+  );
+  
+  const count = reviews.length;
+  return {
+    style: totals.style / count,
+    comfort: totals.comfort / count,
+    fuelEconomy: totals.fuelEconomy / count,
+    performance: totals.performance / count,
+    valueForMoney: totals.valueForMoney / count,
+  };
+}
+
+function renderStars(rating: number, color: string, size: number = 16) {
+  return (
+    <View className="flex-row gap-1">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <Ionicons
+          key={i}
+          name={i < Math.round(rating) ? "star" : "star-outline"}
+          size={size}
+          color={i < Math.round(rating) ? color : "#ccc"}
+        />
+      ))}
+    </View>
+  );
 }
 
 interface DetailRowProps {
@@ -75,6 +131,12 @@ export default function CatalogDetailScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showAllReviews, setShowAllReviews] = useState(false);
+
+  // Derive header title: "Brand Model Year" once loaded
+  const headerTitle = entry
+    ? `${entry.brand?.name} ${entry.model?.name} ${entry.year}`
+    : "Loading...";
 
   const load = useCallback(async () => {
     if (!id || typeof id !== "string") {
@@ -101,44 +163,183 @@ export default function CatalogDetailScreen() {
     void load();
   }, [load]);
 
+  const handleShare = async () => {
+    if (!entry) return;
+    try {
+      await Share.share({
+        message: `Check out this ${entry.title} - ${formatPkr(entry.indicativePrice)}`,
+        url: `https://autowheels.com/catalog/${entry.id}`,
+      });
+    } catch (error) {
+      console.error('Error sharing:', error);
+    }
+  };
+
+  const handleWriteReview = () => {
+    router.push(`/catalog/${id}/write-review`);
+  };
+
+  const handleViewAllReviews = () => {
+    setShowAllReviews(true);
+  };
+
   if (loading) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color={colors.tabActive} />
-        </View>
-      </SafeAreaView>
+      <>
+        <Stack.Screen options={{ headerShown: false }} />
+        <StatusBar barStyle="light-content" backgroundColor={HEADER_COLOR} />
+
+        {/* Top safe area — dark so status bar background matches header */}
+        <SafeAreaView edges={["top"]} style={{ backgroundColor: HEADER_COLOR }} />
+
+        {/* Main content — bottom safe area handled here with screen bg color */}
+        <SafeAreaView
+          edges={["bottom"]}
+          style={{ flex: 1, backgroundColor: colors.background }}
+        >
+          {/* ── Styled Header ── */}
+          <View
+            style={{ backgroundColor: HEADER_COLOR }}
+            className="flex-row items-center gap-3 px-5 pb-4 pt-2"
+          >
+            <Pressable onPress={() => router.back()} hitSlop={8}>
+              <Ionicons name="chevron-back" size={26} color="#fff" />
+            </Pressable>
+            <Text
+              className="flex-1 text-xl font-bold text-white"
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              Loading...
+            </Text>
+          </View>
+
+          {/* ── Body ── */}
+          <View className="flex-1 items-center justify-center">
+            <ActivityIndicator size="large" color={colors.tabActive} />
+          </View>
+        </SafeAreaView>
+      </>
     );
   }
 
   if (error || !entry) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-        <View className="flex-1 items-center justify-center px-8">
-          <Text
-            className="text-center text-base"
-            style={{ color: colors.textSecondary }}
+      <>
+        <Stack.Screen options={{ headerShown: false }} />
+        <StatusBar barStyle="light-content" backgroundColor={HEADER_COLOR} />
+
+        {/* Top safe area — dark so status bar background matches header */}
+        <SafeAreaView edges={["top"]} style={{ backgroundColor: HEADER_COLOR }} />
+
+        {/* Main content — bottom safe area handled here with screen bg color */}
+        <SafeAreaView
+          edges={["bottom"]}
+          style={{ flex: 1, backgroundColor: colors.background }}
+        >
+          {/* ── Styled Header ── */}
+          <View
+            style={{ backgroundColor: HEADER_COLOR }}
+            className="flex-row items-center gap-3 px-5 pb-4 pt-2"
           >
-            {error || "Specifications not found."}
-          </Text>
-          <Pressable
-            onPress={() => router.back()}
-            className="mt-5 rounded-xl px-8 py-3"
-            style={{ backgroundColor: colors.tabActive }}
-          >
-            <Text className="font-semibold text-white">Go Back</Text>
-          </Pressable>
-        </View>
-      </SafeAreaView>
+            <Pressable onPress={() => router.back()} hitSlop={8}>
+              <Ionicons name="chevron-back" size={26} color="#fff" />
+            </Pressable>
+            <Text
+              className="flex-1 text-xl font-bold text-white"
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              Error
+            </Text>
+          </View>
+
+          {/* ── Body ── */}
+          <View className="flex-1 items-center justify-center px-8">
+            <Text
+              className="text-center text-base"
+              style={{ color: colors.textSecondary }}
+            >
+              {error || "Specifications not found."}
+            </Text>
+            <Pressable
+              onPress={() => router.back()}
+              className="mt-5 rounded-xl px-8 py-3"
+              style={{ backgroundColor: colors.tabActive }}
+            >
+              <Text className="font-semibold text-white">Go Back</Text>
+            </Pressable>
+          </View>
+        </SafeAreaView>
+      </>
     );
   }
 
   const images = entry.images || [];
+  const reviews = entry.reviews || [];
+  const overallRating = calculateOverallRating(reviews);
+  const categoryRatings = calculateCategoryRatings(reviews);
+  const displayReviews = showAllReviews ? reviews : reviews.slice(0, 2);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-      <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
-        {/* Image Carousel */}
+    <>
+      <Stack.Screen options={{ headerShown: false }} />
+      <StatusBar barStyle="light-content" backgroundColor={HEADER_COLOR} />
+
+      {/* Top safe area — dark so status bar background matches header */}
+      <SafeAreaView edges={["top"]} style={{ backgroundColor: HEADER_COLOR }} />
+
+      {/* Main content — bottom safe area handled here with screen bg color */}
+      <SafeAreaView
+        edges={["bottom"]}
+        style={{ flex: 1, backgroundColor: colors.background }}
+      >
+        {/* ── Styled Header ── */}
+        <View
+          style={{ backgroundColor: HEADER_COLOR }}
+          className="flex-row items-center gap-3 px-5 pb-4 pt-2"
+        >
+          <Pressable onPress={() => router.back()} hitSlop={8}>
+            <Ionicons name="chevron-back" size={26} color="#fff" />
+          </Pressable>
+          <Text
+            className="flex-1 text-xl font-bold text-white"
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {loading ? "Loading..." : headerTitle}
+          </Text>
+          <Pressable onPress={handleShare} className="p-2">
+            <Ionicons name="share-outline" size={20} color="white" />
+          </Pressable>
+        </View>
+
+        {/* ── Body ── */}
+        <View style={{ flex: 1, backgroundColor: colors.background }}>
+          {loading ? (
+            <View className="flex-1 items-center justify-center">
+              <ActivityIndicator size="large" color={colors.tabActive} />
+            </View>
+          ) : error || !entry ? (
+            <View className="flex-1 items-center justify-center px-8">
+              <Text
+                className="text-center text-base"
+                style={{ color: colors.textSecondary }}
+              >
+                {error || "Specifications not found."}
+              </Text>
+              <Pressable
+                onPress={() => router.back()}
+                className="mt-5 rounded-xl px-8 py-3"
+                style={{ backgroundColor: colors.tabActive }}
+              >
+                <Text className="font-semibold text-white">Go Back</Text>
+              </Pressable>
+            </View>
+          ) : (
+            <>
+              <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
+                {/* Image Carousel */}
         {images.length > 0 ? (
           <View
             style={{ height: IMAGE_HEIGHT, backgroundColor: colors.surface }}
@@ -190,18 +391,9 @@ export default function CatalogDetailScreen() {
           </View>
         )}
 
-        {/* Back Button Overlay */}
-        <Pressable
-          onPress={() => router.back()}
-          className="absolute left-4 top-14 z-10 rounded-full p-2"
-          style={{ backgroundColor: "rgba(0,0,0,0.4)" }}
-        >
-          <Ionicons name="chevron-back" size={24} color="white" />
-        </Pressable>
-
-        {/* Title and Price */}
+        {/* Title and Price Section */}
         <View
-          className="border-b px-4 py-4"
+          className="mt-6 border-b px-4 py-4"
           style={{ borderColor: colors.border }}
         >
           <Text
@@ -694,9 +886,127 @@ export default function CatalogDetailScreen() {
           </View>
         )}
 
+        {/* Reviews Section */}
+        <View
+          className="border-b px-4 py-5"
+          style={{ borderColor: colors.border }}
+        >
+          {/* Reviews Header */}
+          <View className="mb-4 flex-row items-center justify-between">
+            <View className="flex-1">
+              <Text
+                className="text-lg font-bold"
+                style={{ color: colors.textPrimary }}
+              >
+                {entry.brand?.name} {entry.model?.name} Reviews
+              </Text>
+              <Text className="text-sm" style={{ color: colors.textSecondary }}>
+                {reviews.length} customer review{reviews.length !== 1 ? 's' : ''}
+              </Text>
+            </View>
+            {reviews.length > 2 && !showAllReviews && (
+              <Pressable onPress={handleViewAllReviews}>
+                <Text
+                  className="text-sm font-semibold"
+                  style={{ color: colors.tabActive }}
+                >
+                  View all
+                </Text>
+              </Pressable>
+            )}
+          </View>
+
+          {/* Overall Rating */}
+          <View className="mb-4 flex-row items-center gap-4">
+            <View className="items-center">
+              <Text
+                className="text-3xl font-bold"
+                style={{ color: colors.tabActive }}
+              >
+                {overallRating.toFixed(1)}
+              </Text>
+              <Text className="text-xs" style={{ color: colors.textSecondary }}>
+                /5
+              </Text>
+            </View>
+            <View className="flex-1">
+              {renderStars(overallRating, colors.tabActive, 20)}
+            </View>
+          </View>
+
+          {/* Category Ratings */}
+          <View
+            className="mb-4 gap-3 rounded-xl border p-4"
+            style={{ borderColor: colors.border, backgroundColor: colors.surface }}
+          >
+            <View className="flex-row items-center justify-between">
+              <Text className="text-sm" style={{ color: colors.textSecondary }}>
+                Style
+              </Text>
+              <View>{renderStars(categoryRatings.style, colors.tabActive, 14)}</View>
+            </View>
+            <View className="flex-row items-center justify-between">
+              <Text className="text-sm" style={{ color: colors.textSecondary }}>
+                Comfort
+              </Text>
+              <View>{renderStars(categoryRatings.comfort, colors.tabActive, 14)}</View>
+            </View>
+            <View className="flex-row items-center justify-between">
+              <Text className="text-sm" style={{ color: colors.textSecondary }}>
+                Fuel Economy
+              </Text>
+              <View>{renderStars(categoryRatings.fuelEconomy, colors.tabActive, 14)}</View>
+            </View>
+            <View className="flex-row items-center justify-between">
+              <Text className="text-sm" style={{ color: colors.textSecondary }}>
+                Performance
+              </Text>
+              <View>{renderStars(categoryRatings.performance, colors.tabActive, 14)}</View>
+            </View>
+            <View className="flex-row items-center justify-between">
+              <Text className="text-sm" style={{ color: colors.textSecondary }}>
+                Value for Money
+              </Text>
+              <View>{renderStars(categoryRatings.valueForMoney, colors.tabActive, 14)}</View>
+            </View>
+          </View>
+
+          {/* Individual Reviews */}
+          {displayReviews.length > 0 ? (
+            displayReviews.map((review) => (
+              <ReviewCard
+                key={review.id}
+                review={review}
+                isDark={isDark}
+              />
+            ))
+          ) : (
+            <View className="items-center py-8">
+              <Text style={{ color: colors.textSecondary }}>
+                No reviews yet. Be the first to review this car!
+              </Text>
+            </View>
+          )}
+
+          {/* Write Review Button */}
+          <Pressable
+            onPress={handleWriteReview}
+            className="mt-4 rounded-xl px-6 py-3"
+            style={{ backgroundColor: colors.tabActive }}
+          >
+            <Text className="text-center font-semibold text-white">
+              Write a Review
+            </Text>
+          </Pressable>
+        </View>
+
         {/* Spacer */}
         <View style={{ height: 20 }} />
       </ScrollView>
-    </SafeAreaView>
+            </>
+          )}
+        </View>
+      </SafeAreaView>
+    </>
   );
 }

@@ -10,7 +10,7 @@ import {
   Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { getAppColors } from "@/hooks/use-theme";
+import { getAppColors } from "@/constants/app-colors";
 import { apiRequest } from "@/lib/api";
 
 interface WriteReviewModalProps {

@@ -5,6 +5,7 @@ import {
   Pressable,
   Text,
   View,
+  StatusBar,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -19,6 +20,7 @@ import type {
   CatalogSectionKey,
 } from "@/types/home-listing";
 
+const HEADER_COLOR = "#032d42";
 const CATALOG_SECTION_TITLES: Record<CatalogSectionKey, string> = {
   latest: "Recently added specs",
   featured: "Highlighted models",
@@ -58,8 +60,7 @@ export default function BrowseScreen() {
   const [error, setError] = useState<string | null>(null);
 
   const headerTitle =
-    CATALOG_SECTION_TITLES[catalogSection] ??
-    CATALOG_SECTION_TITLES.latest;
+    CATALOG_SECTION_TITLES[catalogSection] ?? CATALOG_SECTION_TITLES.latest;
 
   const buildCatalogQuery = useCallback(
     (nextSkip: number) => {
@@ -78,7 +79,9 @@ export default function BrowseScreen() {
     setLoading(true);
     setError(null);
     try {
-      const data = await apiRequest<BrowseCatalogResponse>(buildCatalogQuery(0));
+      const data = await apiRequest<BrowseCatalogResponse>(
+        buildCatalogQuery(0),
+      );
       const rows = data.entries ?? [];
       setItems(rows);
       setTotal(data.total);
@@ -103,7 +106,9 @@ export default function BrowseScreen() {
 
     setLoadingMore(true);
     try {
-      const data = await apiRequest<BrowseCatalogResponse>(buildCatalogQuery(skip));
+      const data = await apiRequest<BrowseCatalogResponse>(
+        buildCatalogQuery(skip),
+      );
       const rows = data.entries ?? [];
       setItems((prev) => [...prev, ...rows]);
       setSkip((s) => s + rows.length);
@@ -115,79 +120,95 @@ export default function BrowseScreen() {
     }
   };
 
-  const subtitleParts = [`New car brochures (not listed for sale)`, search.trim() ? `“${search.trim()}”` : null].filter(
-    Boolean,
-  );
+  const subtitleParts = [
+    `New car brochures`,
+    search.trim() ? `“${search.trim()}”` : null,
+  ].filter(Boolean);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>
-      <View
-        className="flex-row items-center gap-3 border-b px-4 py-3"
-        style={{ borderColor: colors.border }}
-      >
-        <Pressable
-          onPress={() => router.back()}
-          hitSlop={12}
-          accessibilityRole="button"
-          accessibilityLabel="Go back"
-        >
-          <Ionicons name="chevron-back" size={26} color={colors.textPrimary} />
-        </Pressable>
-        <View className="flex-1">
-          <Text className="text-lg font-bold" style={{ color: colors.textPrimary }}>
-            {headerTitle}
-          </Text>
-          <Text className="text-xs" style={{ color: colors.textSecondary }}>
-            {subtitleParts.join(" · ")}
-          </Text>
-        </View>
-      </View>
+    <>
+      <StatusBar barStyle="light-content" backgroundColor={HEADER_COLOR} />
 
-      {loading ? (
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color={colors.tabActive} />
-        </View>
-      ) : error ? (
-        <View className="flex-1 items-center justify-center px-8">
-          <Text style={{ color: colors.textSecondary }} className="text-center text-base">
-            {error}
-          </Text>
+      {/* Top safe area — dark so status bar background matches header */}
+      <SafeAreaView edges={["top"]} style={{ backgroundColor: HEADER_COLOR }} />
+
+      {/* Main content — bottom safe area handled here with screen bg color */}
+      <SafeAreaView
+        edges={["bottom"]}
+        style={{ flex: 1, backgroundColor: colors.background }}
+      >
+        <View
+          className="flex-row items-center gap-3 px-5 pb-4 pt-2"
+          style={{ backgroundColor: HEADER_COLOR }}
+        >
           <Pressable
-            onPress={() => void loadInitial()}
-            className="mt-5 rounded-xl px-6 py-3"
-            style={{ backgroundColor: colors.tabActive }}
+            onPress={() => router.back()}
+            hitSlop={12}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
           >
-            <Text className="font-semibold text-white">Retry</Text>
+            <Ionicons name="chevron-back" size={26} color="#fff" />
           </Pressable>
+          <View className="flex-1">
+            <Text className="text-xl font-bold text-white">New Cars</Text>
+            <Text className="text-xs text-white/70">
+              {subtitleParts.join(" · ")}
+            </Text>
+          </View>
         </View>
-      ) : (
-        <FlatList
-          data={items}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={{ padding: 16, paddingBottom: 32, gap: 12 }}
-          onEndReachedThreshold={0.35}
-          onEndReached={() => void loadMore()}
-          ListFooterComponent={
-            loadingMore ? (
-              <ActivityIndicator style={{ marginTop: 16 }} color={colors.tabActive} />
-            ) : items.length === 0 ? (
-              <Text
-                className="mt-10 text-center text-base"
-                style={{ color: colors.textSecondary }}
-              >
-                No brochures match yet.
-              </Text>
-            ) : null
-          }
-          renderItem={({ item }) => (
-            <NewCarCatalogCard
-              entry={item}
-              colors={colors}
-              onPress={() => router.push(`/catalog/${item.id}`)}
-            />
-          )}
-        />
-      )}
-    </SafeAreaView>
+
+        {loading ? (
+          <View className="flex-1 items-center justify-center">
+            <ActivityIndicator size="large" color={colors.tabActive} />
+          </View>
+        ) : error ? (
+          <View className="flex-1 items-center justify-center px-8">
+            <Text
+              style={{ color: colors.textSecondary }}
+              className="text-center text-base"
+            >
+              {error}
+            </Text>
+            <Pressable
+              onPress={() => void loadInitial()}
+              className="mt-5 rounded-xl px-6 py-3"
+              style={{ backgroundColor: colors.tabActive }}
+            >
+              <Text className="font-semibold text-white">Retry</Text>
+            </Pressable>
+          </View>
+        ) : (
+          <FlatList
+            data={items}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={{ padding: 16, paddingBottom: 32, gap: 12 }}
+            onEndReachedThreshold={0.35}
+            onEndReached={() => void loadMore()}
+            ListFooterComponent={
+              loadingMore ? (
+                <ActivityIndicator
+                  style={{ marginTop: 16 }}
+                  color={colors.tabActive}
+                />
+              ) : items.length === 0 ? (
+                <Text
+                  className="mt-10 text-center text-base"
+                  style={{ color: colors.textSecondary }}
+                >
+                  No brochures match yet.
+                </Text>
+              ) : null
+            }
+            renderItem={({ item }) => (
+              <NewCarCatalogCard
+                entry={item}
+                colors={colors}
+                onPress={() => router.push(`/catalog/${item.id}`)}
+              />
+            )}
+          />
+        )}
+      </SafeAreaView>
+    </>
   );
 }

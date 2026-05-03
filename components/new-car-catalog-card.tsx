@@ -63,17 +63,21 @@ export function NewCarCatalogCard({
           />
         ) : (
           <View className="flex-1 items-center justify-center">
-            <Ionicons name="document-text-outline" size={38} color={colors.textSecondary} />
+            <Ionicons
+              name="document-text-outline"
+              size={38}
+              color={colors.textSecondary}
+            />
           </View>
         )}
-        <View
+        {/* <View
           className="absolute bottom-0 left-0 right-0 px-2 py-1"
           style={{ backgroundColor: "rgba(0,0,0,0.55)" }}
         >
           <Text className="text-center text-[10px] font-bold uppercase tracking-wide text-white">
             Specs · not for sale
           </Text>
-        </View>
+        </View> */}
       </View>
 
       <View className="p-2.5">
@@ -93,7 +97,10 @@ export function NewCarCatalogCard({
             {entry.subtitle}
           </Text>
         ) : null}
-        <Text className="mt-1 text-sm font-bold" style={{ color: colors.tabActive }}>
+        <Text
+          className="mt-1 text-sm font-bold"
+          style={{ color: colors.tabActive }}
+        >
           {entry.indicativePrice != null && Number(entry.indicativePrice) > 0
             ? `From ~${formatPkr(Number(entry.indicativePrice))}`
             : "Price on request"}
