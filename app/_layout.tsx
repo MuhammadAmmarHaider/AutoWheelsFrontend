@@ -9,9 +9,14 @@ import "react-native-reanimated";
 import "./globals.css";
 import { View } from "react-native";
 import { Provider } from "react-redux";
+import * as SplashScreen from "expo-splash-screen";
+import { useEffect } from "react";
 
 import { ThemeProvider, useTheme } from "@/hooks/use-theme";
 import { store } from "@/store";
+
+// Keep the splash screen visible while we fetch resources
+SplashScreen.preventAutoHideAsync();
 
 export const unstable_settings = {
   anchor: "(tabs)",
@@ -19,6 +24,15 @@ export const unstable_settings = {
 
 function RootLayoutContent() {
   const { isDark } = useTheme();
+
+  useEffect(() => {
+    // Hide the splash screen after the app is ready
+    const timer = setTimeout(() => {
+      SplashScreen.hideAsync();
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <NavigationThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
