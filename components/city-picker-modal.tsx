@@ -7,7 +7,7 @@ import type { getAppColors } from "@/constants/app-colors";
 export type CityOption = { id: string; name: string };
 
 type Colors = ReturnType<typeof getAppColors>;
-
+// The CityPickerModal component is a modal that allows users to select a city from a list of options. It receives props for visibility, closing the modal, the list of cities, the currently selected city ID, a callback for when a city is selected, and the app's color scheme. The modal displays a header with a title and a close button, followed by a scrollable list of cities. Each city option is pressable, and when selected, it calls the onSelect callback with the chosen city and closes the modal. There is also an option to select "All Pakistan" which corresponds to no specific city selection.
 type CityPickerModalProps = {
   visible: boolean;
   onClose: () => void;

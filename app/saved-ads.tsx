@@ -1,4 +1,6 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
+import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
@@ -9,9 +11,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-
+// This screen shows the user's saved ads (favorites). It fetches the list of saved ads from the API and displays them in a list. Users can also remove ads from their saved list by tapping the heart icon. The screen handles loading and error states gracefully, and supports pagination for long lists of saved ads.
 import { VehicleListingCard } from "@/components/vehicle-listing-card";
 import { getAppColors } from "@/constants/app-colors";
 import { SELL_NOW_THEME } from "@/constants/sell-now-theme";

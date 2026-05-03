@@ -8,10 +8,11 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+// This screen is the main home screen of the app. It has two tabs: Used Cars and New Cars. The user can switch between the tabs to see different listings. The screen also has a search bar and a location filter for used cars. The listings are fetched from the API and displayed in horizontal carousels. Each listing card shows the car image, name, price, and location. Tapping on a listing navigates to the listing detail screen.
 import { Ionicons } from "@expo/vector-icons";
-import { StatusBar } from "expo-status-bar";
 import { useRouter } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import {
   CityPickerModal,

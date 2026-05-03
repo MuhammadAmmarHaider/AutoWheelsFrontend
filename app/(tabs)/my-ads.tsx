@@ -9,15 +9,16 @@ import {
   Text,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useFocusEffect } from "@react-navigation/native";
+// This screen shows the user's own ads, categorized into Active, Pending, and Removed (Sold) tabs. The user can switch between the tabs to see their listings in each status. They can also refresh the list, edit active/pending listings, and reactivate removed listings. The screen fetches the user's listings from the API and handles loading and error states.
 import { Ionicons } from "@expo/vector-icons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { MyAdListItem, type MyListing } from "@/components/my-ad-list-item";
-import { SELL_NOW_THEME } from "@/constants/sell-now-theme";
 import { getAppColors } from "@/constants/app-colors";
+import { SELL_NOW_THEME } from "@/constants/sell-now-theme";
 import { useRequireAuth } from "@/hooks/use-require-auth";
 import { useTheme } from "@/hooks/use-theme";
 import { apiRequest } from "@/lib/api";

@@ -17,21 +17,21 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter, useLocalSearchParams } from "expo-router";
-import { Ionicons, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
-import { useDispatch, useSelector } from "react-redux";
-import { apiRequest, uploadImages } from "@/lib/api";
-import { SELL_NOW_THEME } from "@/constants/sell-now-theme";
+// This screen allows users to create a new listing for selling their vehicle. It includes a form with fields for selecting the car model, location, year, body color, mileage, description, price, and contact information. Users can also upload images of their vehicle. The screen handles both creating new listings and editing existing ones. It validates the form inputs and interacts with the API to submit the listing data.
 import { PAKISTAN_CITIES, type City } from "@/constants/cities";
-import {
-  fetchSellFormOptions,
-  fetchCurrentUser,
-  clearError,
-} from "@/store/slices/listingSlice";
-import type { AppDispatch, RootState } from "@/store";
-import { getAuthToken } from "@/lib/auth-storage";
+import { SELL_NOW_THEME } from "@/constants/sell-now-theme";
 import { useRequireAuth } from "@/hooks/use-require-auth";
+import { apiRequest, uploadImages } from "@/lib/api";
+import { getAuthToken } from "@/lib/auth-storage";
+import type { AppDispatch, RootState } from "@/store";
+import {
+  fetchCurrentUser,
+  fetchSellFormOptions
+} from "@/store/slices/listingSlice";
+import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useDispatch, useSelector } from "react-redux";
 type ModelOption = {
   id: string;
   name: string;

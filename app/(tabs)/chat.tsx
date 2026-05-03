@@ -7,14 +7,15 @@ import {
   Text,
   View,
 } from "react-native";
+// This screen shows the list of conversations the user has. It fetches the conversations from the API and displays them in a list. Each conversation item shows the car image, name, location, last message preview, and date. Tapping on a conversation navigates to the chat detail screen.
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { getAppColors } from "@/constants/app-colors";
-import { useTheme } from "@/hooks/use-theme";
 import { useRequireAuth } from "@/hooks/use-require-auth";
+import { useTheme } from "@/hooks/use-theme";
 import { apiRequest } from "@/lib/api";
 import { getCurrentUserId } from "@/lib/auth-storage";
 

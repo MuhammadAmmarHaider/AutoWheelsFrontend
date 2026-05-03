@@ -5,7 +5,7 @@ import { Pressable, Text, View } from "react-native";
 import { formatPkr } from "@/components/home-car-card";
 import type { getAppColors } from "@/constants/app-colors";
 import type { ShowroomCatalogCard } from "@/types/home-listing";
-
+// The NewCarCatalogCard component is a reusable card component that displays information about a car listing. It shows the car's image, title, price, location, year, mileage, and fuel type. The card can be used in various parts of the app, such as the home screen or browse screen, to showcase different car listings. It accepts props for the listing data, color scheme, optional fixed width for horizontal carousels, and an onPress callback for when the card is tapped.
 type Colors = ReturnType<typeof getAppColors>;
 
 type NewCarCatalogCardProps = {

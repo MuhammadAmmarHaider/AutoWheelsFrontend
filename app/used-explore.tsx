@@ -1,4 +1,6 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
+import { useLocalSearchParams, usePathname, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
@@ -10,9 +12,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
-import { useLocalSearchParams, usePathname, useRouter } from "expo-router";
-
+// This screen allows users to browse used car listings. It supports searching for specific models and paginating through the results. The screen fetches the data from the API based on the search query and selected city (if any). It also allows users to mark listings as favorites, which requires authentication. The screen handles loading and error states gracefully, and displays the listings in a list with the option to view details or toggle favorites.
 import { VehicleListingCard } from "@/components/vehicle-listing-card";
 import { getAppColors } from "@/constants/app-colors";
 import { SELL_NOW_THEME } from "@/constants/sell-now-theme";
