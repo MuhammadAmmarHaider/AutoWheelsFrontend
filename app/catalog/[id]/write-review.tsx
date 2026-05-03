@@ -1,23 +1,24 @@
-import { useCallback, useEffect, useState, useRef, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Animated,
   KeyboardAvoidingView,
+  Modal,
+  PanResponder,
   Platform,
+  Pressable,
   ScrollView,
+  StatusBar,
   Text,
   TextInput,
-  View,
-  Pressable,
-  StatusBar,
   TouchableOpacity,
-  Modal,
-  Animated,
-  PanResponder,
+  View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+// This screen allows users to write a review for a specific car model. It fetches the car details using the provided ID, and allows the user to select the car model, enter a review title, write their review, and rate different aspects of the car (style, comfort, fuel economy, performance, value for money). The user can submit their review, which sends the data to the API. The screen also handles loading states and errors gracefully.
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { getAppColors } from "@/constants/app-colors";
 import { SELL_NOW_THEME } from "@/constants/sell-now-theme";
@@ -56,7 +57,7 @@ interface FormFieldProps {
   placeholder?: string;
   loading?: boolean;
 }
-
+// Note: The code for the SelectModal component is included in this file for simplicity, but in a real app it would be better to extract it into its own file for reusability and cleaner code organization.
 function FormField({
   label,
   icon,
@@ -102,6 +103,7 @@ function FormField({
     </View>
   );
 }
+// The SelectModal component is a reusable modal that shows a searchable list of items for the user to select from. It handles its own search state and animations for appearing and disappearing. It also supports categorizing items into "Popular" and "Other" sections based on the order of the provided items.
 
 interface SelectModalProps {
   visible: boolean;
@@ -146,7 +148,7 @@ function SelectModal({
       onClose();
     });
   };
-
+// The pan responder allows the user to drag the modal down to dismiss it. It tracks the vertical movement and if the user drags it down far enough or with enough velocity, it triggers the close animation and callback.
   const panResponder = useRef(
     PanResponder.create({
       onMoveShouldSetPanResponder: (_, gestureState) =>
