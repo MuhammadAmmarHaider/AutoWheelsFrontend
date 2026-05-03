@@ -1,3 +1,5 @@
+import { Ionicons } from "@expo/vector-icons";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -10,13 +12,11 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-
+// This screen shows the chat conversation between the current user and another user regarding a specific listing. It fetches the messages from the API based on the user ID and listing ID passed in the route parameters. The screen displays the messages in a scrollable view, with different styling for sent and received messages. It also includes an input area at the bottom for sending new messages, which calls the API to send the message and then refreshes the message list. The screen handles loading and error states gracefully, and ensures that only authenticated users can access it.
 import { getAppColors } from "@/constants/app-colors";
-import { useTheme } from "@/hooks/use-theme";
 import { useRequireAuth } from "@/hooks/use-require-auth";
+import { useTheme } from "@/hooks/use-theme";
 import { apiRequest } from "@/lib/api";
 import { getCurrentUserId } from "@/lib/auth-storage";
 

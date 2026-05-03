@@ -1,16 +1,16 @@
+import { Ionicons } from "@expo/vector-icons";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
   Pressable,
+  StatusBar,
   Text,
   View,
-  StatusBar,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
-import { useLocalSearchParams, useRouter } from "expo-router";
-
+// This screen shows a list of new car brochures that users can browse through. It supports searching for specific models and paginating through the results. The screen fetches the data from the API based on the selected section (latest, featured, newest_models) and the search query. It handles loading and error states gracefully, and allows users to tap on a brochure to see more details.
 import { NewCarCatalogCard } from "@/components/new-car-catalog-card";
 import { getAppColors } from "@/constants/app-colors";
 import { useTheme } from "@/hooks/use-theme";

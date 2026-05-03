@@ -10,15 +10,16 @@ import {
   Text,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+// This screen shows the details of a specific listing. It fetches the listing details from the API using the ID from the route parameters. The screen displays the listing's images in a carousel, along with its title, price, key features (year, mileage, fuel type, transmission), additional details (registered city, color, model), description, and seller information. It also provides buttons to contact the seller via call, WhatsApp, chat, or SMS. The screen handles loading and error states gracefully.
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { getAppColors } from "@/constants/app-colors";
 import { useTheme } from "@/hooks/use-theme";
 import { apiRequest } from "@/lib/api";
-
+// The ListingDetail interface defines the structure of the listing data that we expect to receive from the API. It includes all the relevant information about the listing, such as title, price, year, mileage, fuel type, transmission, images, brand/model, city, and seller info.
 interface ListingDetail {
   id: string;
   title: string;
@@ -101,7 +102,7 @@ export default function ListingDetailScreen() {
       Linking.openURL(`tel:${phoneNumber}`).catch(() => {});
     }
   };
-
+// The handleCallSeller function attempts to open the phone dialer with the seller's phone number. It first checks if the listing has a contactPhone specified, and if not, it falls back to the user's phone number. If a phone number is available, it uses Linking.openURL with the "tel:" scheme to open the dialer. If there is an error (e.g., no dialer available), it catches it silently.
   const handleWhatsApp = () => {
     const phoneNumber = listing?.contactPhone || listing?.user?.phone;
     if (phoneNumber) {

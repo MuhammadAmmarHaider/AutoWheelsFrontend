@@ -19,11 +19,11 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-import { signInWithPassword, signUpAccount } from "@/lib/auth-api";
-import { setAuthToken } from "@/lib/auth-storage";
+// This screen allows users to create a new account. It has input fields for name, email, phone (optional), password, and confirm password. It validates the input and shows appropriate error messages. When the user submits the form, it calls the signUpAccount API function to create the account, then automatically logs in the user by calling signInWithPassword and storing the auth token. If successful, it redirects the user to the specified redirect path or the home screen.
 import { getAppColors } from "@/constants/app-colors";
 import { useTheme } from "@/hooks/use-theme";
+import { signInWithPassword, signUpAccount } from "@/lib/auth-api";
+import { setAuthToken } from "@/lib/auth-storage";
 
 function formatAuthError(error: unknown): string {
   if (axios.isAxiosError(error)) {

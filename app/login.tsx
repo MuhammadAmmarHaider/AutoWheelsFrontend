@@ -19,12 +19,12 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-import { signInWithPassword } from "@/lib/auth-api";
-import { setAuthToken } from "@/lib/auth-storage";
+// This screen allows users to log in to their account. It has input fields for email and password, and a button to submit the login form. It also handles loading state and displays error messages if the login fails. If the user successfully logs in, it stores the auth token and redirects them to the appropriate screen (either the one specified in the redirect parameter or the home screen).
 import { getAppColors } from "@/constants/app-colors";
 import { useTheme } from "@/hooks/use-theme";
-
+import { signInWithPassword } from "@/lib/auth-api";
+import { setAuthToken } from "@/lib/auth-storage";
+// The formatAuthError function takes an error object and tries to extract a user-friendly error message from it. If the error is an Axios error, it looks for a "message" field in the response data, which can be either a string or an array of strings. If it's an array, it joins them with commas. If it's a string, it returns it directly. If there is no message in the response, it falls back to the error's message property. If the error is not an Axios error but is an instance of Error, it returns its message. Otherwise, it returns a generic error message.
 function formatAuthError(error: unknown): string {
   if (axios.isAxiosError(error)) {
     const data = error.response?.data as
@@ -38,7 +38,7 @@ function formatAuthError(error: unknown): string {
   if (error instanceof Error) return error.message;
   return "Could not sign in. Please try again.";
 }
-
+// The LoginScreen component is the default export of this file. It uses the useRouter and useLocalSearchParams hooks from Expo Router to handle navigation and access route parameters. It also uses a custom useTheme hook to get the current theme and colors. The component maintains state for the email, password, submission status, and whether to show the password. When the user submits the form, it validates the input, calls the signInWithPassword function, stores the auth token, and redirects the user. The UI consists of a back button, a welcome message, input fields for email and password, a submit button, and a link to the signup screen.
 export default function LoginScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ redirect?: string | string[] }>();
