@@ -2,12 +2,12 @@ import { Ionicons } from "@expo/vector-icons";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Feather from '@expo/vector-icons/Feather';
 import { Tabs } from "expo-router";
-import React from "react";
 import { View } from "react-native";
 
 import { HapticTab } from "@/components/haptic-tab";
-import { useTheme } from "@/hooks/use-theme";
 import { getAppColors } from "@/constants/app-colors";
+import { useTheme } from "@/hooks/use-theme";
+// This layout is used for the bottom tab navigation. It defines the appearance and behavior of the tabs.
 
 export default function TabLayout() {
   const { isDark } = useTheme();

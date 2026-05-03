@@ -1,13 +1,13 @@
+import { getAppColors } from "@/constants/app-colors";
+import { useTheme } from "@/hooks/use-theme";
+import { apiRequest } from "@/lib/api";
+import { clearAuthToken, getAuthToken } from "@/lib/auth-storage";
+import { Ionicons } from "@expo/vector-icons";
+import { Link, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Link, useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "@/hooks/use-theme";
-import { getAppColors } from "@/constants/app-colors";
-import { getAuthToken, clearAuthToken } from "@/lib/auth-storage";
-import { apiRequest } from "@/lib/api";
-
+// This screen shows the user's profile information and provides options to log out or navigate to login/signup screens. It fetches the user's info from the API using the stored auth token. If the user is not logged in, it shows options to sign in or create an account. If the user is logged in, it displays their name and email, along with a logout button.
 interface UserInfo {
   id: string;
   name: string;
